@@ -26,22 +26,32 @@ class ImageScrollViewController: UIViewController {
         imageViews.append(ImageViewInfo(index: -1, view: nil, disposable: true))
         imageViews.append(ImageViewInfo(index: -1, view: nil, disposable: true))
         imageViews.append(ImageViewInfo(index: -1, view: nil, disposable: true))
+        if files != nil {
+            initScrollView()
+        }
+        scrollView.delegate = self
     }
     
-    func setFiles(_ files:[FilesystemEntry]) {
+    func setFiles(_ files:[FilesystemEntry], startIndex:Int) {
         self.files = files;
-        let totalWidth = scrollView.visibleSize.width * CGFloat(files.count)
-        scrollView.contentSize = CGSize(width: totalWidth, height: scrollView.visibleSize.height)
+        currentIndex = startIndex
+        if scrollView != nil {
+            initScrollView()
+        }
     }
     
-    func gotoIndex(_ index:Int) {
-        let x = scrollView.visibleSize.width * CGFloat(index)
+    private func initScrollView() {
+        let x = scrollView.visibleSize.width * CGFloat(currentIndex)
         scrollView.contentOffset = CGPoint(x: x, y: 0)
-        currentIndex = index
+        scrollView.isPagingEnabled = true
+        let totalWidth = scrollView.visibleSize.width * CGFloat(files!.count)
+        scrollView.contentSize = CGSize(width: totalWidth, height: scrollView.visibleSize.height)
         refreshScrollView()
     }
     
     private func refreshScrollView() {
+        markValidEntries(startIndex: currentIndex - 1, endIndex: currentIndex + 1)
+        
         loadImageView(atIndex: currentIndex)
         loadImageView(atIndex: currentIndex - 1)
         loadImageView(atIndex: currentIndex + 1)
@@ -56,6 +66,8 @@ class ImageScrollViewController: UIViewController {
         if entry.view == nil {
             entry.view = createImageView(withImageAtIndex: index)
         }
+        entry.disposable = false
+        entry.index = index
         imageViews[entryIndex] = entry
         if entry.view!.superview == nil {
             scrollView.addSubview(entry.view!)
@@ -63,6 +75,7 @@ class ImageScrollViewController: UIViewController {
         var frame = entry.view!.frame
         frame.origin.x = frame.size.width * CGFloat(index)
         entry.view!.frame = frame
+        //print("image at index \(index) starts at \(frame.origin.x)")
     }
     
     /*
@@ -86,6 +99,16 @@ class ImageScrollViewController: UIViewController {
         return 0
     }
     
+    private func markValidEntries(startIndex:Int, endIndex:Int) {
+        for i in 0..<imageViews.count {
+            var entry = imageViews[i]
+            if entry.index < startIndex || entry.index > endIndex {
+                entry.disposable = true
+                imageViews[i] = entry
+            }
+        }
+    }
+    
     private func createImageView(withImageAtIndex index:Int) -> UIImageView {
         let size = scrollView.visibleSize
         let frame = CGRect(x:0, y:0, width:size.width, height: size.height)
@@ -93,6 +116,18 @@ class ImageScrollViewController: UIViewController {
         let fileEntry = files![index]
         let image = imageProvider?.getImage(atFileURL: fileEntry.url)
         imageView.image = image
+        imageView.contentMode = .scaleAspectFit
         return imageView
+    }
+}
+
+extension ImageScrollViewController : UIScrollViewDelegate {
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let position = (Int)(scrollView.contentOffset.x / scrollView.visibleSize.width)
+        if position != currentIndex {
+            currentIndex = position
+            refreshScrollView()
+        }
     }
 }

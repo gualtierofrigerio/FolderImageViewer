@@ -34,10 +34,11 @@ class ViewController: UIViewController {
         return newVC
     }
     
-    private func createImageScrollViewController(withFiles files:[FilesystemEntry]) -> ImageScrollViewController {
+    private func createImageScrollViewController(withFiles files:[FilesystemEntry], startIndex:Int) -> ImageScrollViewController {
         let storyboard = UIStoryboard(name:"Main", bundle:nil)
         let newVC = storyboard.instantiateViewController(withIdentifier: "ImageScrollViewController") as! ImageScrollViewController
         newVC.imageProvider = imageProvider
+        newVC.setFiles(files, startIndex: startIndex)
         return newVC
     }
 
@@ -51,7 +52,7 @@ extension ViewController : FoldersTableViewControllerDelegate {
     }
     
     func showFiles(_ files: [FilesystemEntry], startIndex: Int) {
-        let newImageScrollVC = createImageScrollViewController(withFiles: files)
+        let newImageScrollVC = createImageScrollViewController(withFiles: files, startIndex: startIndex)
         navigation.pushViewController(newImageScrollVC, animated: true)
     }
 }
