@@ -20,6 +20,7 @@ class ImageScrollViewController: UIViewController {
     private var files:[FilesystemEntry]?
     private var imageViews = [ImageViewInfo]()
     private var currentIndex:Int = 0
+    private var internalView = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -44,8 +45,13 @@ class ImageScrollViewController: UIViewController {
         let x = scrollView.visibleSize.width * CGFloat(currentIndex)
         scrollView.contentOffset = CGPoint(x: x, y: 0)
         scrollView.isPagingEnabled = true
+        scrollView.maximumZoomScale = 2.0
+        scrollView.minimumZoomScale = 1.0
         let totalWidth = scrollView.visibleSize.width * CGFloat(files!.count)
-        scrollView.contentSize = CGSize(width: totalWidth, height: scrollView.visibleSize.height)
+        let height = scrollView.visibleSize.height
+        scrollView.contentSize = CGSize(width: totalWidth, height: height)
+        internalView.frame = CGRect(x:0, y:0, width:totalWidth, height:height)
+        scrollView.addSubview(internalView)
         refreshScrollView()
     }
     
@@ -70,7 +76,7 @@ class ImageScrollViewController: UIViewController {
         entry.index = index
         imageViews[entryIndex] = entry
         if entry.view!.superview == nil {
-            scrollView.addSubview(entry.view!)
+            internalView.addSubview(entry.view!)
         }
         var frame = entry.view!.frame
         frame.origin.x = frame.size.width * CGFloat(index)
@@ -129,5 +135,9 @@ extension ImageScrollViewController : UIScrollViewDelegate {
             currentIndex = position
             refreshScrollView()
         }
+    }
+    
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        return internalView
     }
 }
