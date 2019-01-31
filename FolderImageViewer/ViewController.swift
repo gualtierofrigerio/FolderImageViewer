@@ -22,7 +22,8 @@ class ViewController: UIViewController {
     @IBAction func tapOnButton(_ sender:Any) {
         let firstFoldersTVC = createFoldersTableViewController(withFolderName: "", title:"Root folder")
         navigation = UINavigationController(rootViewController: firstFoldersTVC)
-        show(navigation, sender:self)
+        navigation.modalPresentationStyle = .fullScreen
+        present(navigation, animated: true, completion: nil)
     }
     
     private func createFoldersTableViewController(withFolderName folderName:String, title:String) -> FoldersTableViewController {
@@ -46,7 +47,7 @@ class ViewController: UIViewController {
 
 extension ViewController : FoldersTableViewControllerDelegate {
     func showFolder(folderName: String, currentFolder: String) {
-        let newFolderName = currentFolder + "/" + folderName
+        let newFolderName = currentFolder == "" ? folderName : currentFolder + "/" + folderName
         let newFolderVC = createFoldersTableViewController(withFolderName: newFolderName, title: folderName)
         navigation.pushViewController(newFolderVC, animated: true)
     }

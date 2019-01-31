@@ -67,7 +67,12 @@ class FoldersTableViewController: UITableViewController {
         else {
             cell.detailTextLabel?.text = files[indexPath.row].path
             let fileURL = files[indexPath.row].url
-            cell.imageView?.image = imageProvider?.getImage(atFileURL: fileURL!)
+            cell.textLabel?.text = files[indexPath.row].path
+            if let image = imageProvider?.getImage(atFileURL: fileURL!) {
+                cell.imageView?.image = image
+                cell.imageView?.contentMode = .scaleAspectFill
+                cell.textLabel?.textAlignment = .right
+            }
         }
         return cell
     }
