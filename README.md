@@ -4,6 +4,8 @@
 App that uses UITableView and UIScrollView to display images from the filesystem.
 The table views are used to display each folder content, and the scroll view allows to scroll the images contained into the selected folder.
 
+Please refer to this article for implementation details: http://www.gfrigerio.com/2019/02/04/building-an-image-gallery-app/
+
 ## Author
 
 gualtierofrigerio, gualtiero.frigerio@gmail.com
