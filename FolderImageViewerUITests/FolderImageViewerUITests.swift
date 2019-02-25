@@ -8,26 +8,92 @@
 import XCTest
 
 class FolderImageViewerUITests: XCTestCase {
+    
+    var app:XCUIApplication!
 
     override func setUp() {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-
-        // In UI tests it is usually best to stop immediately when a failure occurs.
         continueAfterFailure = false
-
-        // UI tests must launch the application that they test. Doing this in setup will make sure it happens for each test method.
-        XCUIApplication().launch()
-
-        // In UI tests it’s important to set the initial state - such as interface orientation - required for your tests before they run. The setUp method is a good place to do this.
+        app = XCUIApplication()
     }
 
     override func tearDown() {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
-
-    func testExample() {
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+    
+    func testFirstFolder() {
+        startBrowsing()
+        let table = app.tables["Root folder"]
+        XCTAssert(table.cells.count == 3)
+    }
+    
+    func testFolderA() {
+        startBrowsing()
+        
+        let cellA = getFolderACell()
+        let cellAText = cellA.staticTexts.element(boundBy: 0).label
+        
+        XCTAssertEqual(cellAText, "folderA")
+    }
+    
+    func testFolderAContent() {
+        startBrowsing()
+        
+        let cellA = getFolderACell()
+        cellA.tap()
+        
+        XCTAssertTrue(isShowingFolderA())
+        
+        let firstImageCell = getFirstImageFolderA()
+        firstImageCell.tap()
+        
+        XCTAssertTrue(isShowingImages())
+        
+        let subviews = getScrollViewContent()
+        XCTAssertEqual(subviews.count, 2)
     }
 
+}
+
+extension FolderImageViewerUITests {
+    
+    func getFolderACell() -> XCUIElement {
+        let table = app.tables["Root folder"]
+        let cellA = table.cells.element(boundBy: 0)
+        return cellA
+    }
+    
+    func getFirstImageFolderA() -> XCUIElement {
+        let table = app.tables["folderA"]
+        let firstCell = table.cells.element(boundBy:0)
+        return firstCell
+    }
+    
+    func getScrollViewContent() -> [XCUIElement] {
+        let imageScrollVC = app.otherElements["imageScrollViewController"]
+        let scrollView = imageScrollVC.children(matching: .scrollView)
+        let internalView = scrollView.otherElements["scrollViewContainer"]
+        XCTAssertTrue(internalView.exists)
+        let images = internalView.children(matching: .any)
+        return images.allElementsBoundByAccessibilityElement
+    }
+    
+    func isShowingFolderA() -> Bool {
+        return app.otherElements["folderA"].exists
+    }
+    
+    func isShowingFoldersModal() -> Bool {
+        return app.tables["Root folder"].exists
+    }
+    
+    func isShowingImages() -> Bool {
+        return app.otherElements["imageScrollViewController"].exists
+    }
+    
+    func startBrowsing() {
+        app.launch()
+        let button = app.buttons["Start browsing"]
+        button.tap()
+        
+        XCTAssertTrue(isShowingFoldersModal())
+    }
 }

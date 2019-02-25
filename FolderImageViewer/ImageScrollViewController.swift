@@ -31,6 +31,9 @@ class ImageScrollViewController: UIViewController {
             initScrollView()
         }
         scrollView.delegate = self
+        self.view.accessibilityIdentifier = "imageScrollViewController"
+        scrollView.accessibilityIdentifier = "scrollView"
+        internalView.accessibilityIdentifier = "scrollViewContainer"
     }
     
     func setFiles(_ files:[FilesystemEntry], startIndex:Int) {

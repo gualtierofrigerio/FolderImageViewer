@@ -32,6 +32,7 @@ class ViewController: UIViewController {
         newVC.setDataSource(dataSource, currentFolder: folderName, title: title)
         newVC.imageProvider = imageProvider
         newVC.delegate = self
+        newVC.tableView.accessibilityIdentifier = title
         return newVC
     }
     

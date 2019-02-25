@@ -23,6 +23,7 @@ class FoldersTableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        tableView.accessibilityIdentifier = "foldersTableView"
     }
     
     func setDataSource(_ dataSource:FilesystemDataSource, currentFolder:String, title:String) {
